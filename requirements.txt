@@ -59,3 +59,4 @@ typing-extensions==4.0.1
 w3lib==1.22.0
 wcwidth==0.2.5
 zope.interface==5.4.0
+*.bat
