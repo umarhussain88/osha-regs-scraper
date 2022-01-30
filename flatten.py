@@ -21,6 +21,8 @@ def flatten_json(file : Path):
     df = pd.read_json(file)
     articles = df['article'].apply(lambda x : BeautifulSoup(x, 'html.parser'))
     df['ExternalId'] = articles.apply(lambda x : x.find('article').get("data-history-node-id"))
+
+    df = df.rename(columns={'article' : 'content'})
     return df
 
 #create iso folder
@@ -31,6 +33,22 @@ def create_iso_folder(path : str):
         p.mkdir()
     return p
 
+#create citation dataframe
+def citation_df(dataframe : pd.DataFrame) -> pd.DataFrame:
+    """Explodes along the title column after splitting out citations. 
+       joins and uses externalId for many:1 join"""
+
+    citation_df = dataframe[["ExternalId"]].join(
+         dataframe["title"]
+         .str.split("-", expand=True)[1]
+         .str.replace("\[|\]", "", regex=True)
+         .str.split(";")
+         .explode()
+     ).reset_index(drop=True)
+
+    
+
+    return citation_df.rename(columns={1 : 'Content'})
 
 
 if __name__ == '__main__':
@@ -38,4 +56,7 @@ if __name__ == '__main__':
     file = get_newest_file('osha/output')
     df = flatten_json(file)
     iso_path = create_iso_folder('osha/output')
-    df.to_csv(iso_path.joinpath('osha_flattened.csv'), index=False)
+    df.to_csv(iso_path.joinpath('letters_of_interpretation.csv'), index=False)
+    c_df = citation_df(df)
+    c_df.to_csv(iso_path.joinpath('citations.csv'), index=False)
+    
