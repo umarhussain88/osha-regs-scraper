@@ -4,15 +4,12 @@ from ..items import OshaItem
 
 
 class oshaSpider(scrapy.Spider):
-    # define the fields for your item here like:
     name = "regs"
     allowed_domains = ["www.osha.gov"]
     start_urls = [
         "https://www.osha.gov/laws-regs/standardinterpretations/publicationdate"
     ]
     source_url = start_urls[0].split("/law")[0]
-
-    # name = scrapy.Field()
 
     # start requests
     def parse(self, response):
@@ -26,14 +23,14 @@ class oshaSpider(scrapy.Spider):
 
     def get_pages(self, response):
 
-        data_points = response.xpath('//div[@class="item-list"]')
+        data_points = response.xpath('//div[@class="item-list"]/ul')
 
-        for data_point in data_points:
+        for li in data_points.xpath('li'):
             items = OshaItem()
             items["year"] = response.url.split("/")[-1]
-            items["date"] = data_point.xpath("ul/li/div/span/strong/text()").get()
-            items["title"] = data_point.xpath("ul/li/div/span/a/text()").get()
-            items["href"] = data_point.xpath("ul/li/div/span/a/@href").get()
+            items["date"] = li.xpath("div/span/strong/text()").get()
+            items["title"] = li.xpath("div/span/a/text()").get()
+            items["href"] = li.xpath("div/span/a/@href").get()
 
             yield scrapy.Request(
                 self.source_url + items["href"],
