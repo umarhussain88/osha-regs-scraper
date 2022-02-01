@@ -32,7 +32,7 @@ class Engine:
             EXEC @bid = mc_datalayer.[etl].[sp_ins_batchProcess] 
                 @batchProcess = 'Merge Government Hosted Publicly Available Addative Content',
                 @BatchType = 'stg1 scrape',
-                @src =  {src}
+                @src =  {src},
                 @trf = {target_file_name},
                 @dst = {destination_output}
         """	
