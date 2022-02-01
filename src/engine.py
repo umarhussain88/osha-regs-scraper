@@ -32,9 +32,9 @@ class Engine:
             EXEC @bid = mc_datalayer.[etl].[sp_ins_batchProcess] 
                 @batchProcess = 'Merge Government Hosted Publicly Available Addative Content',
                 @BatchType = 'stg1 scrape',
-                @src =  {src},
-                @trf = {target_file_name},
-                @dst = {destination_output}
+                @src =  '{src}',
+                @trf = '{target_file_name}',
+                @dst = '{destination_output}'
         """	
 
         with self.engine.begin() as conn:
@@ -46,7 +46,7 @@ class Engine:
     def update_batch_job(self, bid):
         """updates job table after completion"""
 
-        sql_str = f"""EXEC mc_datalayer.[etl].[sp_upd_batchProcess] @{bid}"""
+        sql_str = f"""EXEC mc_datalayer.[etl].[sp_upd_batchProcess] @'{bid}' """
 
         with self.engine.begin() as conn:
 
