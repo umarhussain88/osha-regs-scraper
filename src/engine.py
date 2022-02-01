@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from dataclasses import dataclass
+import pandas as pd
 
 @dataclass
 class Engine:
@@ -15,9 +16,20 @@ class Engine:
 
         object.__setattr__(self,'engine', 
         create_engine(
-            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?trusted_connection=yes&driver=ODBC+Driver+17+for+SQL+Server",
+            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server",
             fast_executemany=True)
         )
+
+    #test if engine is alive
+    def test_engine(self):
+        """
+        test if engine is alive
+        """
+        with self.engine.begin() as conn:
+            conn.execute("SELECT 1")
+            return True
+        
+
                         
 
     def insert_batch_job(self,etl_name : str, target_file_name : str, src : str,
@@ -39,8 +51,8 @@ class Engine:
 
         with self.engine.begin() as conn:
             job_exec = conn.execute(sql_str)
-            jobkey = job_exec.first()[0]
-        return jobkey
+            
+        return pd.read_sql("select max(batchid) as bid from etl.batchprocess", self.engine)['bid'].values[0]
 
 
     def update_batch_job(self, bid):

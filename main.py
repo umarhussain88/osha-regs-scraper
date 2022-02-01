@@ -10,7 +10,7 @@ from sys import argv
 logger = logger_util(__name__)
 
 
-# eng = Engine()
+eng = Engine()
 
 if __name__ == '__main__':
 
@@ -49,8 +49,9 @@ if __name__ == '__main__':
     standards_df.to_csv(Path(destination_path).joinpath('LoiDocuments.csv'), index=False)
     logger.info('Standards written to stg folder')
 
-
     
+
+
 
 
 
