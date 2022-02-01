@@ -1,11 +1,8 @@
 from sqlalchemy import create_engine
 from dataclasses import dataclass
 
-import sqlalchemy
-
-
 @dataclass
-class Engine(sqlalchemy):
+class Engine:
 
     server: str
     database: str
@@ -17,7 +14,7 @@ class Engine(sqlalchemy):
     def __post_init__(self):
 
         object.__setattr__(self,'engine', 
-        self.create_engine(
+        create_engine(
             f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?trusted_connection=yes&driver=ODBC+Driver+17+for+SQL+Server",
             fast_executemany=True)
         )
