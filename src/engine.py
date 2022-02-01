@@ -37,7 +37,7 @@ class Engine:
                 @dst = {destination_output}
         """	
 
-        with self.engine() as conn:
+        with self.engine.begin() as conn:
             job_exec = conn.execute(sql_str)
             jobkey = job_exec.first()[0]
         return jobkey
@@ -48,6 +48,6 @@ class Engine:
 
         sql_str = f"""EXEC mc_datalayer.[etl].[sp_upd_batchProcess] @{bid}"""
 
-        with self.engine() as conn:
+        with self.engine.begin() as conn:
 
             conn.execute(sql_str)
