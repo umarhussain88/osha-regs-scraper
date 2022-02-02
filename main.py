@@ -52,15 +52,15 @@ if __name__ == '__main__':
 
 
     process = CrawlerProcess({'FEED_FORMAT': 'json','FEED_URI': 'output/standards.json'})
-    key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json',
-                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='articles.json')
+    key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
+                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
     process.crawl(StandardRegsSpider)
     process.start()                               
 
     row_count = pd.read_json('output/standards.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
 
-    with open('output/articles.json') as f:
+    with open('output/standards.json') as f:
         data = json.load(f)
     
     audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [data]})
