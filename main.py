@@ -1,5 +1,7 @@
 from pathlib import Path
 from sys import argv
+import os 
+import json
 
 import pandas as pd
 
@@ -17,38 +19,59 @@ from src.standards import standards_dataframe
 
 logger = logger_util(__name__)
 
-eng = Engine()
+
+eng = Engine(username=os.getenv('osha_db_user'), password=os.getenv('osha_db_password'),
+                                server=os.getenv('db_server'), database=os.getenv('db_name')
+    )
+audit_eng = Engine(username=os.getenv('osha_db_user'), password=os.getenv('osha_db_password'),
+                                server=os.getenv('db_server'), database='mc_staging'
+                )
 
 if __name__ == '__main__':
 
     logger.info('starting articles/citations spider')
 
 
-    key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json',
+    key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json', target_file_name='articles.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/publicationdate')
-
-    
-    #start process crawler and output to json
 
     process = CrawlerProcess({'FEED_FORMAT': 'json','FEED_URI': 'output/articles.json'})
     process.crawl(oshaSpider)
     process.start()
-    row_count = pd.read_json('output/standards.json').shape[0]
+    row_count = pd.read_json('output/articles.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
+
+    with open('output/articles.json') as f:
+        data = json.load(f)
+    
+    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [data]})
+    audit_df.to_sql('stg2_oshaLOIjson', audit_eng, if_exists='append', index=False)
+
+
+    
 
 
     process = CrawlerProcess({'FEED_FORMAT': 'json','FEED_URI': 'output/standards.json'})
     key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json',
-                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards')
+                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='articles.json')
     process.crawl(StandardRegsSpider)
     process.start()                               
 
     row_count = pd.read_json('output/standards.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
 
+    with open('output/articles.json') as f:
+        data = json.load(f)
+    
+    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [data]})
+    audit_df.to_sql('stg2_oshaLOIjson', audit_eng, if_exists='append', index=False)
+    
 
 
-    eng.insert_batch_job(batch_type='main.py - etl', destination_path='/stg1/', )
+
+    eng.insert_batch_job(batch_type='main.py - etl', destination_path='/stg1/', 
+                         target_file_name='F:\OneDrive - Mancomm\Mancomm Inc\Mancomm Inc\Data Exchange - src_OSHA\stg1',
+                         src='output/')
     destination_path = argv[1]
     if not Path(destination_path).exists():
         logger.critical(f'{destination_path} does not exist!')
