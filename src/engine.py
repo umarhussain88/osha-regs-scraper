@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
 from dataclasses import dataclass
 import pandas as pd
+import sqlalchemy
 
 @dataclass
-class Engine:
+class Engine(sqlalchemy.engine.Engine):
 
     server: str
     database: str
