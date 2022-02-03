@@ -10,7 +10,17 @@ class oshaSpider(scrapy.Spider):
         "https://www.osha.gov/laws-regs/standardinterpretations/publicationdate"
     ]
     source_url = start_urls[0].split("/law")[0]
+    
+    #custom settings overwrite file
+    custom_settings = {
+        "FEEDS" : {
+            "output/articles.json" :{ 
+            "format" : "json",
+            "overwrite" : True
+            }
 
+        }
+    }
     # start requests
     def parse(self, response):
 

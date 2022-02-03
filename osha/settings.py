@@ -19,9 +19,6 @@ NEWSPIDER_MODULE = 'osha.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
-#overwrite the bloody file.
-FEEDS = {"overwrite": True}
-
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 

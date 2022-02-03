@@ -11,9 +11,16 @@ class StandardRegsSpider(scrapy.Spider):
     ]
 
     source_url = "https://www.osha.gov"
+    custom_settings = {
+        "FEEDS" : {
+            "output/standards.json" :{ 
+            "format" : "json",
+            "overwrite" : True
+            }
 
-    #encode the content to base64
-    #items["standard_content"] = base64.b64encode(items["standard_content"])
+        }
+    }
+
 
 
     def parse(self, response):
