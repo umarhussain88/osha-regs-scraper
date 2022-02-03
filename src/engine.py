@@ -4,7 +4,7 @@ import pandas as pd
 import sqlalchemy
 
 @dataclass
-class Engine(sqlalchemy.engine.Engine):
+class Engine:
 
     server: str
     database: str
