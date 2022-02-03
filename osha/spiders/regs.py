@@ -52,5 +52,5 @@ class oshaSpider(scrapy.Spider):
 
         items = response.meta["items"]
         items["article"] = response.xpath("//div[@class='region region-content']").get()
-        items['title'] = response.xpath('//title').get()
+        items['article_title'] = response.xpath('//title').get()
         yield items
