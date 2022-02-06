@@ -48,7 +48,7 @@ if __name__ == '__main__':
         data = json.load(f)
     
     audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [json.dumps(data)]})
-    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng, if_exists='append', index=False)
+    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng.engine, if_exists='append', index=False)
 
 
     key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
@@ -63,12 +63,12 @@ if __name__ == '__main__':
         data = json.load(f)
     
     audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [json.dumps(data)]})
-    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng, if_exists='append', index=False)
+    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng.engine, if_exists='append', index=False)
     
 
 
 
-    eng.insert_batch_job(batch_type='main.py - etl', destination_path='/stg1/', 
+    eng.insert_batch_job(batch_type='main.py - etl', destination_output='/stg1/', 
                          target_file_name='F:\OneDrive - Mancomm\Mancomm Inc\Mancomm Inc\Data Exchange - src_OSHA\stg1',
                          src='output/')
     destination_path = argv[1]
