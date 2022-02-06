@@ -6,6 +6,8 @@ import json
 import pandas as pd
 
 from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+
 from osha.spiders import oshaSpider, StandardRegsSpider
 
 
@@ -35,7 +37,8 @@ if __name__ == '__main__':
     key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json', target_file_name='articles.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/publicationdate')
 
-    process = CrawlerProcess({'FEED_FORMAT': 'json','FEED_URI': 'output/articles.json'})
+    process = CrawlerProcess(get_project_settings())
+
     process.crawl(oshaSpider)
     process.start()
     row_count = pd.read_json('output/articles.json').shape[0]
@@ -44,14 +47,10 @@ if __name__ == '__main__':
     with open('output/articles.json') as f:
         data = json.load(f)
     
-    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [data]})
-    audit_df.to_sql('stg2_oshaLOIjson', audit_eng, if_exists='append', index=False)
+    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [json.dumps(data)]})
+    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng, if_exists='append', index=False)
 
 
-    
-
-
-    process = CrawlerProcess({'FEED_FORMAT': 'json','FEED_URI': 'output/standards.json'})
     key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
     process.crawl(StandardRegsSpider)
@@ -63,8 +62,8 @@ if __name__ == '__main__':
     with open('output/standards.json') as f:
         data = json.load(f)
     
-    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [data]})
-    audit_df.to_sql('stg2_oshaLOIjson', audit_eng, if_exists='append', index=False)
+    audit_df = pd.DataFrame({'batchKey' : key, 'jsonBody' : [json.dumps(data)]})
+    audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng, if_exists='append', index=False)
     
 
 

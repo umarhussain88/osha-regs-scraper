@@ -17,8 +17,7 @@ class Engine:
 
         object.__setattr__(self,'engine', 
         create_engine(
-            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server",
-            fast_executemany=True)
+            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server",)
         )
 
     #test if engine is alive
@@ -31,16 +30,13 @@ class Engine:
             return True
         
 
-                        
-
     def insert_batch_job(self,batch_type : str, 
                          target_file_name : str, src : str,
-                         destination_output : str) -> str:
+                         destination_output : str) -> int:
         """
         generates the BatchID prior to starting ETL job - 
         this will be used to update the log upon completion or failure.
         """
-
         sql_str = f"""
             DECLARE @bid INT
             EXEC @bid = mc_datalayer.[etl].[sp_ins_batchProcess] 
