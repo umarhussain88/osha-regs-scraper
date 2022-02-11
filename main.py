@@ -2,6 +2,7 @@ from pathlib import Path
 from sys import argv
 import os 
 import json
+from time import sleep
 
 import pandas as pd
 
@@ -53,6 +54,7 @@ if __name__ == '__main__':
 
     key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
+    sleep(5)
     process.crawl(StandardRegsSpider)
     process.start()                               
 
@@ -68,9 +70,11 @@ if __name__ == '__main__':
 
 
 
-    eng.insert_batch_job(batch_type='main.py - etl', destination_output='/stg1/', 
-                         target_file_name='F:\OneDrive - Mancomm\Mancomm Inc\Mancomm Inc\Data Exchange - src_OSHA\stg1',
-                         src='output/')
+    key = eng.insert_batch_job(batch_type='main.py',destination_output='output/loi.csv',
+        src='osha-regs', target_file_name='loi.csv')
+                         
+    logger.info(f'key is {key}')
+    
     destination_path = argv[1]
     if not Path(destination_path).exists():
         logger.critical(f'{destination_path} does not exist!')
@@ -79,9 +83,7 @@ if __name__ == '__main__':
     logger.info(f'Destination path - {destination_path}')
 
     logger.info('starting program')
-    file = Path(__file__).parent.joinpath('output/articles.json')
-    key = logkey()
-    logger.info(f'key is {key}')
+    file = Path(__file__).parent.joinpath('output/articles.json')   
 
     logger.info(f"Latest file - {file.stem}")
     df = flatten_json(file)
@@ -98,11 +100,11 @@ if __name__ == '__main__':
     c_df.to_csv(Path(destination_path).joinpath('citations.csv'), index=False)
     logger.info('Citations written to stg folder')
 
-    standards_file =  Path(__file__).joinpath('output/standards.json')
+    standards_file =  Path(__file__).parent.joinpath('output/standards.json')
 
     logger.info(f"Latest file - {standards_file.stem}")
     standards_df = standards_dataframe(standards_file)
     standards_df['Process'] = key
     standards_df.to_csv(Path(destination_path).joinpath('LoiDocuments.csv'), index=False)
     logger.info('Standards written to stg folder')
-    eng.update_batch_job(bid=key, row_count=0)
+    #eng.update_batch_job(bid=key, row_count='0')
