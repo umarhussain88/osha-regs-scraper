@@ -17,7 +17,7 @@ class Engine:
 
         object.__setattr__(self,'engine', 
         create_engine(
-            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server",)
+            f"mssql+pyodbc://{self.username}:{self.password}@{self.server}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server")
         )
 
     #test if engine is alive

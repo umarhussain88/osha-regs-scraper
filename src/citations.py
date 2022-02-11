@@ -73,3 +73,10 @@ def citation_df(dataframe: pd.DataFrame) -> pd.DataFrame:
     )
 
     return citation_df.rename(columns={1: "Content"})
+
+#remove bulleted-list-header node-header from the html output 
+
+def remove_ul_header(soup: BeautifulSoup) -> BeautifulSoup:
+    for node in soup.findAll("ul", {"class": "bulleted-list-header node-header"}):
+        node.decompose()
+    return soup.prettify()

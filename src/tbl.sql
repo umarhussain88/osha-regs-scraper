@@ -8,5 +8,4 @@ CREATE TABLE [stg2].[oshaLOIjson]
 ALTER TABLE  [stg2].[oshaLOIjson]
   ADD CONSTRAINT [jsonBody record should be formatted as JSON]
     CHECK (ISJSON(jsonBody) = 1)
-
 ;

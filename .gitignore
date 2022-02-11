@@ -136,3 +136,6 @@ output/*
 *.bat
 /logs
 debug.ipynb
+main-dev.py
+Pipfile
+test.html
