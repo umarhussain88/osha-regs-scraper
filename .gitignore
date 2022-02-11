@@ -135,3 +135,6 @@ dmypy.json
 output/*
 *.bat
 /logs
+main-dev.py
+Pipfile
+test.html
