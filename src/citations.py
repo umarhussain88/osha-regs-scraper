@@ -47,7 +47,7 @@ def create_iso_folder(path: str):
 def strip_title(df: pd.DataFrame):
 
     df1 = df.copy()
-    df1["title"] = df1["title"].str.split("-", expand=True)[0]
+    df1["title"] = df1["title"].str.split("- \[\d", expand=True)[0]
     df1['content'] = df1['content'] + df1['article_title']
 
     df1 = df1.drop('article_title',axis=1)

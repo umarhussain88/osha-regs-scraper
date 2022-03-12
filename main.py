@@ -3,6 +3,7 @@ from sys import argv
 import os 
 import json
 from time import sleep
+from bs4 import BeautifulSoup
 
 import pandas as pd
 
@@ -23,10 +24,10 @@ from src.standards import standards_dataframe
 logger = logger_util(__name__)
 
 
-eng = Engine(username=os.getenv('osha_db_user'), password=os.getenv('osha_db_password'),
+eng = Engine(username='etl', password=os.getenv('osha_db_password'),
                                 server=os.getenv('db_server'), database=os.getenv('db_name')
     )
-audit_eng = Engine(username=os.getenv('osha_db_user'), password=os.getenv('osha_db_password'),
+audit_eng = Engine(username='etl',password=os.getenv('osha_db_password'),
                                 server=os.getenv('db_server'), database='mc_staging'
                 )
 
@@ -40,8 +41,13 @@ if __name__ == '__main__':
 
     process = CrawlerProcess(get_project_settings())
 
-    process.crawl(oshaSpider)
-    process.start()
+    process.crawl(oshaSpider,StandardRegsSpider)
+    process.crawl(StandardRegsSpider)
+
+    key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
+                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
+    process.start()      
+
     row_count = pd.read_json('output/articles.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
 
@@ -52,11 +58,7 @@ if __name__ == '__main__':
     audit_df.to_sql('oshaLOIjson',schema='stg2',con=audit_eng.engine, if_exists='append', index=False)
 
 
-    key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
-                               src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
-    sleep(5)
-    process.crawl(StandardRegsSpider)
-    process.start()                               
+                             
 
     row_count = pd.read_json('output/standards.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
@@ -80,6 +82,8 @@ if __name__ == '__main__':
                          
     logger.info(f'key is {key}')
     
+    #debug only 
+    # argv = ['', r'F:\OneDrive - Mancomm\Mancomm Inc\Mancomm Inc\Data Exchange - src_OSHA\stg1']
     destination_path = argv[1]
     if not Path(destination_path).exists():
         logger.critical(f'{destination_path} does not exist!')
@@ -95,7 +99,8 @@ if __name__ == '__main__':
 
     loi = strip_title(df)
     loi['Process'] = key
-    loi['article'] = loi['article'].apply(remove_ul_header)
+    loi['content'] = loi['content'].apply(lambda x : BeautifulSoup(x, 'html.parser'))
+    loi['content'] = loi['content'].apply(remove_ul_header)
     loi.to_csv(Path(destination_path).joinpath('letters_of_interpretation.csv'), index=False)
     
 
@@ -113,4 +118,4 @@ if __name__ == '__main__':
     standards_df['Process'] = key
     standards_df.to_csv(Path(destination_path).joinpath('LoiDocuments.csv'), index=False)
     logger.info('Standards written to stg folder')
-    eng.update_batch_job(bid=key, row_count='0')
+    # eng.update_batch_job(bid=key, row_count='0')
