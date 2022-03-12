@@ -1,0 +1,18 @@
+version: "3.2"
+services:
+    
+    sql-server-db:
+      container_name: sql-server-db
+      image: mcr.microsoft.com/mssql/server:2019-latest
+      restart: always
+      hostname: sql-server-db
+      ports:
+        - "1433:1433"
+
+      volumes:
+        - ./data:/var/opt/mssql/data
+
+
+      environment:
+        SA_PASSWORD: "P@ssw0rd"
+        ACCEPT_EULA: "Y"

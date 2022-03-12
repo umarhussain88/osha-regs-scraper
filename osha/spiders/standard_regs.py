@@ -1,7 +1,6 @@
 import scrapy
 from ..items import OshaItem
 from bs4 import BeautifulSoup
-import base64
 
 class StandardRegsSpider(scrapy.Spider):
     name = "standards"

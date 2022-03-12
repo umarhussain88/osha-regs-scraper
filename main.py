@@ -1,25 +1,18 @@
+import json
+import os
 from pathlib import Path
 from sys import argv
-import os 
-import json
 from time import sleep
-from bs4 import BeautifulSoup
 
 import pandas as pd
-
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
-
-from osha.spiders import oshaSpider, StandardRegsSpider
-
+from bs4 import BeautifulSoup
 
 from src import logkey
 from src.citations import (citation_df, create_iso_folder, flatten_json,
-                           get_newest_file, strip_title, remove_ul_header)
+                           get_newest_file, remove_ul_header, strip_title)
 from src.engine import Engine
 from src.logger import logger_util
 from src.standards import standards_dataframe
-
 
 logger = logger_util(__name__)
 
@@ -35,18 +28,12 @@ if __name__ == '__main__':
 
     logger.info('starting articles/citations spider')
 
-
     key = eng.insert_batch_job(batch_type='articles',destination_output='output/articles.json', target_file_name='articles.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/publicationdate')
 
-    process = CrawlerProcess(get_project_settings())
-
-    process.crawl(oshaSpider,StandardRegsSpider)
-    process.crawl(StandardRegsSpider)
 
     key = eng.insert_batch_job(batch_type='standards',destination_output='output/standards.json',
                                src='https://www.osha.gov/laws-regs/standardinterpretations/standards', target_file_name='standards.json')
-    process.start()      
 
     row_count = pd.read_json('output/articles.json').shape[0]
     eng.update_batch_job(bid=key, row_count=row_count)
@@ -82,8 +69,6 @@ if __name__ == '__main__':
                          
     logger.info(f'key is {key}')
     
-    #debug only 
-    # argv = ['', r'F:\OneDrive - Mancomm\Mancomm Inc\Mancomm Inc\Data Exchange - src_OSHA\stg1']
     destination_path = argv[1]
     if not Path(destination_path).exists():
         logger.critical(f'{destination_path} does not exist!')
