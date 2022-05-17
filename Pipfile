@@ -8,6 +8,7 @@ scrapy = "*"
 azure-storage-blob = "*"
 beautifulsoup4 = "*"
 pandas = "*"
+Pipfile = "*"
 
 [dev-packages]
 
