@@ -4,6 +4,7 @@ from osha.osha.spiders import oshaSpider, StandardRegsSpider
 # from .clean import Clean
 from .engine import  Exporter
 from .utils import logger_util
+from .clean import parse_regulations, parse_reponse_text_html
 
 
 logger = logger_util(__name__)
@@ -38,4 +39,4 @@ def run_spider(spider_name : str , settings = get_project_settings):
     process.start()
 
 
-__all__ = [logger_util, run_spider, Exporter]
+__all__ = [logger_util, run_spider, Exporter, parse_reponse_text_html, parse_regulations]

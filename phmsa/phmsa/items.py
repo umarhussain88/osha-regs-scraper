@@ -17,6 +17,7 @@ class PhmsaItem(scrapy.Item):
     company_name = scrapy.Field()
     individual_name = scrapy.Field()
     response_doc_href = scrapy.Field()
+    regulation_list_page = scrapy.Field()
     
     regulation_title = scrapy.Field()
     location_state = scrapy.Field()
