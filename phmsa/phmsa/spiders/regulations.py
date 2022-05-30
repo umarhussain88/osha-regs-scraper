@@ -13,7 +13,7 @@ class RegulationsSpider(scrapy.Spider):
     start_urls = [
         'https://www7.phmsa.dot.gov/regulations/title49/b/2/1/list?']
 
-    custom_settings: Optional[dict] = {
+    custom_settings =  {
         "FEEDS": {
             "output/phmsa_regulations.json": {
                 "format": "json",
@@ -35,7 +35,7 @@ class RegulationsSpider(scrapy.Spider):
         for page in range(0, int(pages) + 1):
 
             url = self.source_url + f"{page_url[0]}={page}"
-            self.log(url, logging.WARN)
+            self.log(url, logging.INFO)
             yield scrapy.Request(url, callback=self.get_subjects, meta={'page': f"{page_url[0]}={page}"})
 
     def get_subjects(self, response):
@@ -49,7 +49,7 @@ class RegulationsSpider(scrapy.Spider):
             subject = each_subject.xpath('td/a/text()').get().strip()
 
             url = each_subject.xpath('td/a/@href').get()
-            self.log(url, logging.WARN)
+            self.log(url, logging.INFO)
             yield scrapy.Request(self.source_url + url, callback=self.get_regulation_list_pages,
                                  meta={'subject': subject, 'section': section, 'page': response.meta['page']})
 
@@ -63,7 +63,7 @@ class RegulationsSpider(scrapy.Spider):
 
             for page in range(0, int(last_page) + 1):
                 follow_page = f"{page_url[0]}={page}"
-                self.log(follow_page, logging.WARN)
+                self.log(follow_page, logging.INFO)
 
                 yield scrapy.Request(self.source_url + follow_page, callback=self.get_regulation_list,
                                      meta={'subject': response.meta['subject'],
@@ -73,7 +73,7 @@ class RegulationsSpider(scrapy.Spider):
 
         else:
             url = response.url.split('.gov')[1]
-            self.log(self.source_url + url, logging.WARN)
+            self.log(self.source_url + url, logging.INFO)
             yield scrapy.Request(self.source_url + url, dont_filter=True,
                                  callback=self.get_regulation_list, meta={'subject': response.meta['subject'],
                                                                           'section': response.meta['section'],
@@ -104,7 +104,7 @@ class RegulationsSpider(scrapy.Spider):
                 'text()').get().strip()
             items['response_doc_href'] = row_body[4].xpath('a/@href').get()
 
-            self.log(follow, logging.WARN)
+            self.log(follow, logging.INFO)
             yield scrapy.Request(self.source_url + follow, callback=self.get_regulation_detail,
                                  meta={'items': items})
 

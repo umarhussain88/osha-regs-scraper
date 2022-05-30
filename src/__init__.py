@@ -1,6 +1,7 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from osha.osha.spiders import oshaSpider, StandardRegsSpider
+from phmsa.phmsa.spiders import RegulationsSpider
 # from .clean import Clean
 from .engine import  Exporter
 from .utils import logger_util
@@ -25,7 +26,7 @@ def run_spider(spider_name : str , settings = get_project_settings):
         ValueError: if the spider_name is not one of the supported options
     """
 
-    spider_names = {'oshaSpider' : oshaSpider, 'StandardRegsSpider' : StandardRegsSpider}
+    spider_names = {'oshaSpider' : oshaSpider, 'StandardRegsSpider' : StandardRegsSpider, 'phmsa_RegulationsSpider' : RegulationsSpider}
 
     if spider_name not in spider_names:
         logger.error(f'{spider_name} is not a supported spider')
