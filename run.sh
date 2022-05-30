@@ -1,4 +1,4 @@
-#!/bin/sh
+# !/bin/sh
 
 export LC_ALL=en_US.utf-8
 pipenv run python3 main.py oshaSpider
