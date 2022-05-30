@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     elif argv[1] == 'clean-phmsa-regulations':
 
-        with open('phmsa/output/phmsa_regulations.json') as f:
+        with open('output/phmsa_regulations.json') as f:
             j = json.load(f)
 
         df = pd.json_normalize(j)
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         logger.info(
             f'Writing {df.shape[0]} rows to blob storage as phmsa_regulations.csv')
 
-        exp.write_to_blob_storage('phmsa_regulations.csv', df)
+        # exp.write_to_blob_storage('phmsa_regulations.csv', df)
 
     else:
         spider_name = argv[1]

@@ -18,7 +18,9 @@ NEWSPIDER_MODULE = 'osha.spiders'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
-
+LOG_LEVEL = 'ERROR'
+LOG_FORMAT = '%(levelname)s: %(message)s'
+LOG_FILE = 'logs/app.txt'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
