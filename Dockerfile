@@ -12,4 +12,4 @@ RUN pipenv install --deploy --ignore-pipfile
 # Copy project
 COPY . . 
 
-RUN ./run.sh
+CMD sh ./run.sh

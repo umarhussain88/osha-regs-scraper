@@ -14,7 +14,8 @@ class StandardRegsSpider(scrapy.Spider):
         "FEEDS" : {
             "output/standards.json" :{ 
             "format" : "json",
-            "overwrite" : True
+            "overwrite" : True,
+            "logging_level" : "ERROR"
             }
 
         }

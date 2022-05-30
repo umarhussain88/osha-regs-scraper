@@ -15,7 +15,8 @@ class oshaSpider(scrapy.Spider):
         "FEEDS" : {
             "output/articles.json" :{ 
             "format" : "json",
-            "overwrite" : True
+            "overwrite" : True,
+            "logging_level" : "ERROR"
             }
 
         }
