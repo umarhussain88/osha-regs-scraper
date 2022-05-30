@@ -17,7 +17,8 @@ class RegulationsSpider(scrapy.Spider):
         "FEEDS": {
             "output/phmsa_regulations.json": {
                 "format": "json",
-                "overwrite": True
+                "overwrite": True,
+                "logging_level" : "ERROR"
             }
 
         }
