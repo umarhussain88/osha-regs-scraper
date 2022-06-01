@@ -4,6 +4,14 @@ logs
 /output
 *.vscode
 
+#ipython notebooks for dev.
+
+*.pyc
+
+*.ipynb_checkpoints
+*.ipynb_checkpoints.json
+*.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
