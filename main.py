@@ -1,4 +1,4 @@
-from src import Exporter, logger_util, run_spider, parse_reponse_text_html, parse_regulations
+from src import Exporter, logger_util, run_spider, Clean
 import os
 from sys import argv
 from pathlib import Path
@@ -10,10 +10,18 @@ exp = Exporter(blob_storage_url=os.environ.get('BLOB_STORAGE_URL'),
                blob_container_name=os.environ.get('BLOB_CONTAINER_NAME'))
 
 
+cl = Clean()
+
 logger = logger_util(__name__)
 
 
 if __name__ == '__main__':
+    
+    if not Path(__file__).parent.joinpath('export').exists():
+        Path(__file__).parent.joinpath('export').mkdir()
+        logger.info('creating export folder')
+
+    trg_export_path = Path(__file__).parent.joinpath('export')
 
     if len(argv) != 2:
         print("Usage: python main.py <spider_name> or export-azure")
@@ -22,12 +30,53 @@ if __name__ == '__main__':
 
     if argv[1] == 'export-azure':
         logger.info("Exporting data to Azure Blob Storage")
-        for file in Path(__file__).parent.joinpath('output').glob('*.json'):
-            with open(file, 'r') as f:
-                logger.info(f'Parsing {file.name}')
-                j = json.load(f)
-                df = pd.json_normalize(j)
-                exp.write_to_blob_storage(file.stem + '.csv', df)
+        for file in trg_export_path.glob('*.csv'):
+            df = pd.read_csv(file)
+            exp.write_to_blob_storage(file.name, df)
+
+    elif argv[1] == 'create-osha-exports':
+
+        logger.info('Creating OSHA exports')
+
+        # articles.csv  - loi articles
+        with open('output/articles.json', 'r') as f:
+            j = json.load(f)
+            df = pd.json_normalize(j)
+
+        article_df = cl.get_article_from_html(df)
+        article_df = cl.strip_title(article_df)
+        # very expensive operation - look at doing this in a better way.
+        content = cl.create_bs4_object_from_series(article_df["content"])
+        content = content.apply(cl.remove_ul_header)
+        content = cl.create_bs4_object_from_series(content)
+        content = content.apply(cl.remove_copyright_header)
+        article_df["content"] = content.copy()
+        article_df["created_date"] = pd.Timestamp(
+            "now").strftime("%Y-%m-%d %H:%M:%S")
+
+        # citations
+
+        citation_df = cl.citation_df(df)
+
+        # standards dataframe
+
+        with open('output/standards.json', 'r') as f:
+            j = json.load(f)
+            df = pd.json_normalize(j)
+
+        standards_df = cl.standards_dataframe(df)
+        logger.info(f"Dataframe shape: {standards_df.shape}")
+        standards_df["created_date"] = pd.Timestamp(
+            "now").strftime("%Y-%m-%d %H:%M:%S")
+
+
+
+        article_df.to_csv(trg_export_path.joinpath(
+            'articles.csv'), index=False)
+        standards_df.to_csv(trg_export_path.joinpath(
+            'standards.csv'), index=False)
+        citation_df.to_csv(trg_export_path.joinpath(
+            'citations.csv'), index=False)
 
     elif argv[1] == 'clean-phmsa-regulations':
 
@@ -36,13 +85,13 @@ if __name__ == '__main__':
 
         df = pd.json_normalize(j)
 
-        df['response_text_html'] = parse_reponse_text_html(df)
-        df['regulations'] = parse_regulations(df)
+        df['response_text_html'] = cl.parse_reponse_text_html(df)
+        df['regulations'] = cl.parse_regulations(df)
 
-        logger.info(
-            f'Writing {df.shape[0]} rows to blob storage as phmsa_regulations.csv')
+        logger.info('saving file')
+        
+        df.to_csv(trg_export_path.joinpath('phmsa_regulations.csv'), index=False)
 
-        # exp.write_to_blob_storage('phmsa_regulations.csv', df)
 
     else:
         spider_name = argv[1]
