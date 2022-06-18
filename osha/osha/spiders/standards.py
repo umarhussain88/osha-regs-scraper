@@ -10,6 +10,7 @@ class StandardRegsSpider(scrapy.Spider):
     ]
 
     source_url = "https://www.osha.gov"
+    #LoiDocuments
     custom_settings = {
         "FEEDS" : {
             "output/standards.json" :{ 
@@ -43,9 +44,9 @@ class StandardRegsSpider(scrapy.Spider):
     def get_standard_content(self, response):
 
         items = response.meta["items"]
-        items["standard_page_title"] = response.xpath("//title").get()
+        items["standard_contents_page_title"] = response.xpath("//title").get()
 
-        items["standard_content"] = response.xpath(
+        items["standard_contents_page_content"] = response.xpath(
             '//div[@class="views-element-container form-group"]'
         ).get()
         urls = response.xpath('//div[@class="item-list"]/ul/li/div/span/a/@href')

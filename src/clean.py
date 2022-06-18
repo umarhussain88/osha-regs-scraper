@@ -16,21 +16,23 @@ class Clean:
 
         return df
 
-    def standards_dataframe(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+    def standards_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
 
+        dataframe = df.copy()
+        
         dataframe["Name"] = dataframe["standard_title"].str.extract(
             "Part (\d+) -")
         dataframe["Content"] = (
             dataframe["standard_page_title"] +
             "\n" + dataframe["standard_content"]
         )
-        final_df = dataframe[["Name", "Content"]]
+        final_df = dataframe[["Name", "Content"]].copy()
 
         return final_df
 
     def create_bs4_object_from_series(self, df: pd.Series) -> BeautifulSoup:
 
-        df = df.apply(lambda x: BeautifulSoup(x, "html.parser"))
+        df = df.apply(lambda x: BeautifulSoup(x, "html.parser")).copy()
         return df
 
     def get_article_from_html(self, dataframe: pd.DataFrame) -> pd.DataFrame:

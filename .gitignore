@@ -4,6 +4,12 @@ logs
 /output
 *.vscode
 
+
+#output and export folders.
+
+output/*
+export/*
+
 #ipython notebooks for dev.
 
 *.pyc

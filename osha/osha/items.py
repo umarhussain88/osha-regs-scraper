@@ -9,5 +9,7 @@ class OshaItem(scrapy.Item):
     article = scrapy.Field()
     article_title = scrapy.Field()
     standard_title = scrapy.Field()
+    standard_contents_page_title = scrapy.Field()
+    standard_contents_page_content = scrapy.Field()
     standard_content = scrapy.Field()
     standard_page_title = scrapy.Field()

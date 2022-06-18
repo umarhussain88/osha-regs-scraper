@@ -12,6 +12,7 @@ class oshaSpider(scrapy.Spider):
     
     #custom settings overwrite file
     custom_settings = {
+        #LettersOfInterpretation
         "FEEDS" : {
             "output/articles.json" :{ 
             "format" : "json",
